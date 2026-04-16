@@ -1,17 +1,63 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Spam Detector</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            text-align: center;
+            color: white;
+            margin-top: 100px;
+        }
+        .box {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            margin: auto;
+        }
+        textarea {
+            width: 90%;
+            height: 100px;
+        }
+        button {
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+        }
+        .spam { color: red; }
+        .notspam { color: green; }
+    </style>
+</head>
 <body>
 
-<h2>Spam Detection</h2>
+<div class="box">
+    <h2>Spam Detector</h2>
 
-<form action="/predict" method="post">
-    <textarea name="email" rows="5" cols="40"></textarea><br><br>
-    <button type="submit">Check</button>
-</form>
+    <form action="/predict" method="post">
+        <textarea name="message"></textarea><br>
+        <button type="submit">Check</button>
+    </form>
 
-{% if prediction %}
-<h3>{{ prediction }}</h3>
-{% endif %}
+    {% if result %}
+        <h3 class="{{ 'spam' if result=='Spam' else 'notspam' }}">
+            {{ result }}
+        </h3>
+        <p>Confidence: {{ confidence }}%</p>
+    {% endif %}
+
+    {% if history %}
+        <h3>History</h3>
+        <ul>
+        {% for msg, res in history %}
+            <li>{{ msg }} → {{ res }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</div>
 
 </body>
 </html>
