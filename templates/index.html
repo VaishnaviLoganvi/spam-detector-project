@@ -1,63 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Spam Detector</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            text-align: center;
-            color: white;
-            margin-top: 100px;
-        }
-        .box {
-            background: white;
-            color: black;
-            padding: 30px;
-            border-radius: 10px;
-            width: 400px;
-            margin: auto;
-        }
-        textarea {
-            width: 90%;
-            height: 100px;
-        }
-        button {
-            padding: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-        }
-        .spam { color: red; }
-        .notspam { color: green; }
-    </style>
-</head>
-<body>
+<h3>📊 Spam Analysis</h3>
 
-<div class="box">
-    <h2>Spam Detector</h2>
+<canvas id="myChart" width="300" height="200"></canvas>
 
-    <form action="/predict" method="post">
-        <textarea name="message"></textarea><br>
-        <button type="submit">Check</button>
-    </form>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    {% if result %}
-        <h3 class="{{ 'spam' if result=='Spam' else 'notspam' }}">
-            {{ result }}
-        </h3>
-        <p>Confidence: {{ confidence }}%</p>
-    {% endif %}
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
 
-    {% if history %}
-        <h3>History</h3>
-        <ul>
-        {% for msg, res in history %}
-            <li>{{ msg }} → {{ res }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-</div>
-
-</body>
-</html>
+var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Spam', 'Not Spam'],
+        datasets: [{
+            label: 'Message Count',
+            data: [{{ spam }}, {{ notspam }}],
+        }]
+    }
+});
+</script>
