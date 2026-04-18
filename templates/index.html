@@ -3,28 +3,20 @@
 <head>
     <title>Spam Detector</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         body {
-            margin: 0;
-            font-family: Arial;
             background: #0f172a;
             color: white;
+            font-family: Arial;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        .container {
-            display: flex;
-            gap: 20px;
-        }
-
         .box {
             background: #1e293b;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             width: 350px;
             text-align: center;
@@ -45,71 +37,57 @@
             color: white;
             border: none;
             border-radius: 5px;
+            cursor: pointer;
         }
 
-        .spam { color: red; }
-        .notspam { color: lightgreen; }
+        button:hover {
+            background: #2563eb;
+        }
 
-        canvas {
-            background: white;
-            border-radius: 10px;
+        .spam {
+            color: red;
+            font-weight: bold;
+        }
+
+        .notspam {
+            color: lightgreen;
+            font-weight: bold;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
-    <!-- LEFT SIDE (INPUT) -->
-    <div class="box">
-        <h2>Spam Detector</h2>
-
-        <form action="/predict" method="post">
-            <textarea name="message" placeholder="Enter message..."></textarea>
-            <br>
-            <button type="submit">Check</button>
-        </form>
-
-        {% if result %}
-            <h3 class="{{ 'spam' if result=='Spam' else 'notspam' }}">
-                {{ result }}
-            </h3>
-            <p>Confidence: {{ confidence }}%</p>
-        {% endif %}
-
-        {% if history %}
-            <h4>History</h4>
-            <ul>
-            {% for msg, res in history %}
-                <li>{{ msg }} → {{ res }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <h3>Spam Detector</h3>
+        <a href="/logout">
+            <button style="background:red;">Logout</button>
+        </a>
     </div>
 
-    <!-- RIGHT SIDE (GRAPH) -->
-    <div class="box">
-        <h3>Spam Analysis</h3>
-        <canvas id="chart"></canvas>
-    </div>
+    <!-- FORM -->
+    <form action="/predict" method="post">
+        <textarea name="message" placeholder="Enter your message..."></textarea><br>
+        <button type="submit">Check</button>
+    </form>
+
+    <!-- RESULT -->
+    {% if result %}
+        <h3 class="{{ 'spam' if result=='Spam' else 'notspam' }}">
+            Result: {{ result }}
+        </h3>
+    {% endif %}
 
 </div>
-
-<script>
-var ctx = document.getElementById('chart').getContext('2d');
-
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Spam', 'Not Spam'],
-        datasets: [{
-            label: 'Count',
-            data: [{{ spam }}, {{ notspam }}],
-        }]
-    }
-});
-</script>
 
 </body>
 </html>
