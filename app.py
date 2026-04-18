@@ -7,8 +7,8 @@ app.secret_key = "secret123"
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-USERNAME = "admin"
-PASSWORD = "1234"
+USERNAME = "Vaishnavi"
+PASSWORD = "Vaishu@31"
 
 
 # 🔹 LOGIN PAGE
