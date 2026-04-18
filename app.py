@@ -1,48 +1,65 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session
 import pickle
 
 app = Flask(__name__)
+app.secret_key = "secret123"
 
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-history = []
-spam_count = 0
-not_spam_count = 0
+USERNAME = "admin"
+PASSWORD = "1234"
 
+
+# 🔹 LOGIN PAGE
 @app.route('/')
-def home():
-    return render_template("index.html", spam=spam_count, notspam=not_spam_count)
+def login():
+    return render_template("login.html")
 
+
+# 🔹 LOGIN CHECK
+@app.route('/login', methods=['POST'])
+def do_login():
+    username = request.form['username']
+    password = request.form['password']
+
+    if username == USERNAME and password == PASSWORD:
+        session['user'] = username
+        return redirect('/home')
+    else:
+        return render_template("login.html", error="Invalid Credentials")
+
+
+# 🔹 HOME PAGE
+@app.route('/home')
+def home():
+    if 'user' not in session:
+        return redirect('/')
+    return render_template("index.html")
+
+
+# 🔹 PREDICT
 @app.route('/predict', methods=['POST'])
 def predict():
-    global spam_count, not_spam_count
+    if 'user' not in session:
+        return redirect('/')
 
     message = request.form['message']
 
     data = vectorizer.transform([message])
     prediction = model.predict(data)[0]
-    probability = model.predict_proba(data)[0]
 
-    if prediction == 1:
-        result = "Spam"
-        confidence = round(probability[1]*100, 2)
-        spam_count += 1
-    else:
-        result = "Not Spam"
-        confidence = round(probability[0]*100, 2)
-        not_spam_count += 1
+    result = "Spam" if prediction == 1 else "Not Spam"
 
-    history.append((message, result))
+    return render_template("index.html", result=result)
 
-    return render_template(
-        "index.html",
-        result=result,
-        confidence=confidence,
-        history=history,
-        spam=spam_count,
-        notspam=not_spam_count
-    )
+
+# 🔹 LOGOUT
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/')
+
 
 if __name__ == "__main__":
     app.run()
