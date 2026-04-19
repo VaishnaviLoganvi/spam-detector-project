@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, redirect, session
+=from flask import Flask, render_template, request, redirect, session
 import pickle
 
 app = Flask(__name__)
 app.secret_key = "secret123"
 
-# Load trained model and vectorizer
+# Load model
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
@@ -12,13 +12,12 @@ vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 USERNAME = "Vaishnavi"
 PASSWORD = "Vaishu@31"
 
-# ---------------- LOGIN PAGE ----------------
+# ---------------- LOGIN ----------------
 @app.route('/')
 def login():
     return render_template("login.html")
 
 
-# ---------------- LOGIN CHECK ----------------
 @app.route('/login', methods=['POST'])
 def do_login():
     username = request.form['username']
@@ -31,7 +30,7 @@ def do_login():
         return render_template("login.html", error="Invalid Credentials")
 
 
-# ---------------- HOME PAGE ----------------
+# ---------------- HOME ----------------
 @app.route('/home')
 def home():
     if 'user' not in session:
@@ -39,7 +38,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- SPAM PREDICTION ----------------
+# ---------------- PREDICT ----------------
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'user' not in session:
@@ -47,14 +46,18 @@ def predict():
 
     message = request.form['message'].lower()
 
-    # Rule-based spam keywords
-    spam_words = ["win", "free", "claim", "urgent", "click", "prize", "offer"]
+    # 🔥 STRONG RULE-BASED DETECTION
+    spam_words = [
+        "win", "free", "claim", "offer", "prize",
+        "urgent", "immediately", "act now", "limited",
+        "verify", "account", "login", "password", "bank", "security", "alert",
+        "earn", "money", "cash", "loan", "investment", "income", "profit",
+        "click", "link", "http", "www"
+    ]
 
-    # Rule-based detection
     if any(word in message for word in spam_words):
         result = "Spam"
     else:
-        # ML prediction
         data = vectorizer.transform([message])
         prediction = model.predict(data)[0]
         result = "Spam" if prediction == 1 else "Not Spam"
@@ -69,6 +72,6 @@ def logout():
     return redirect('/')
 
 
-# ---------------- RUN APP ----------------
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)
