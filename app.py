@@ -12,7 +12,8 @@ vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 USERNAME = "Vaishnavi"
 PASSWORD = "Vaishu@31"
 
-# ---------------- LOGIN ----------------
+
+# -------- LOGIN --------
 @app.route('/')
 def login():
     return render_template("login.html")
@@ -30,7 +31,7 @@ def do_login():
         return render_template("login.html", error="Invalid Credentials")
 
 
-# ---------------- HOME ----------------
+# -------- HOME --------
 @app.route('/home')
 def home():
     if 'user' not in session:
@@ -38,7 +39,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- PREDICT ----------------
+# -------- PREDICT --------
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'user' not in session:
@@ -46,7 +47,7 @@ def predict():
 
     message = request.form['message'].lower()
 
-    # 🔥 STRONG RULE-BASED DETECTION
+    # 🔥 spam keywords
     spam_words = [
         "win", "free", "claim", "offer", "prize",
         "urgent", "immediately", "act now", "limited",
@@ -55,23 +56,61 @@ def predict():
         "click", "link", "http", "www"
     ]
 
-    if any(word in message for word in spam_words):
+    # 🔥 disguised spam
+    suspicious_phrases = [
+        "we tried reaching you",
+        "important update",
+        "please respond",
+        "contact you",
+        "important message",
+        "account issue",
+        "act quickly"
+    ]
+
+    score = 0
+    found_words = []
+
+    # rule scoring
+    for word in spam_words:
+        if word in message:
+            score += 2
+            found_words.append(word)
+
+    for phrase in suspicious_phrases:
+        if phrase in message:
+            score += 3
+            found_words.append(phrase)
+
+    # ML prediction
+    data = vectorizer.transform([message])
+    prediction = model.predict(data)[0]
+
+    if prediction == 1:
+        score += 3
+
+    # final decision
+    if score >= 4:
         result = "Spam"
     else:
-        data = vectorizer.transform([message])
-        prediction = model.predict(data)[0]
-        result = "Spam" if prediction == 1 else "Not Spam"
+        result = "Not Spam"
 
-    return render_template("index.html", result=result)
+    confidence = min(score * 20, 100)
+
+    return render_template(
+        "index.html",
+        result=result,
+        confidence=confidence,
+        words=found_words
+    )
 
 
-# ---------------- LOGOUT ----------------
+# -------- LOGOUT --------
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     return redirect('/')
 
 
-# ---------------- RUN ----------------
+# -------- RUN --------
 if __name__ == "__main__":
     app.run(debug=True)
