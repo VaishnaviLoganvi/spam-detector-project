@@ -1,27 +1,127 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align:center; margin-top:100px;">
+<head>
+    <title>Spam Detector</title>
 
-<a href="/logout"><button>Logout</button></a>
+    <style>
+        body {
+            background: #0f172a;
+            font-family: 'Segoe UI', sans-serif;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-<h2>Spam Detector</h2>
+        .container {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
 
-<form action="/predict" method="post">
-<textarea name="message" rows="5" cols="40"></textarea><br><br>
-<button>Check</button>
-</form>
+        h2 {
+            margin-bottom: 15px;
+            color: #38bdf8;
+        }
 
-{% if result %}
-<h3>{{ result }}</h3>
-{% endif %}
+        textarea {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            border: none;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #0f172a;
+            color: white;
+            font-size: 14px;
+        }
 
-{% if confidence %}
-<p>Confidence: {{ confidence }}%</p>
-{% endif %}
+        textarea:focus {
+            outline: none;
+            border: 2px solid #38bdf8;
+        }
 
-{% if words %}
-<p>Detected: {{ words }}</p>
-{% endif %}
+        button {
+            background: #38bdf8;
+            border: none;
+            padding: 10px 20px;
+            color: black;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .spam {
+            color: #ef4444;
+        }
+
+        .notspam {
+            color: #22c55e;
+        }
+
+        .info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .logout {
+            background: #ef4444;
+            margin-bottom: 10px;
+        }
+
+        .logout:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="/logout">
+        <button class="logout">Logout</button>
+    </a>
+
+    <h2>📩 Spam Detector</h2>
+
+    <form action="/predict" method="post">
+        <textarea name="message" placeholder="Enter your message..."></textarea>
+        <br>
+        <button type="submit">Check Message</button>
+    </form>
+
+    {% if result %}
+        <div class="result {{ 'spam' if result=='Spam' else 'notspam' }}">
+            {{ result }}
+        </div>
+    {% endif %}
+
+    {% if confidence %}
+        <div class="info">Confidence: {{ confidence }}%</div>
+    {% endif %}
+
+    {% if words %}
+        <div class="info">Detected: {{ words }}</div>
+    {% endif %}
+
+</div>
 
 </body>
 </html>
