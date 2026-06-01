@@ -1,27 +1,114 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align:center; margin-top:100px;">
+<head>
+<title>Cyber Threat Detection</title>
 
-<a href="/logout"><button>Logout</button></a>
+<style>
 
-<h2>Spam Detector</h2>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+padding:40px;
+}
 
-<form action="/predict" method="post">
-<textarea name="message" rows="5" cols="40"></textarea><br><br>
-<button>Check</button>
+.container{
+max-width:900px;
+margin:auto;
+}
+
+textarea{
+width:100%;
+height:150px;
+padding:15px;
+font-size:16px;
+border-radius:10px;
+}
+
+button{
+padding:12px 25px;
+background:#06b6d4;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+.result{
+background:#1e293b;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+}
+
+ul{
+text-align:left;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🛡 AI-Powered Cyber Threat Detection System</h1>
+
+<form action="/predict" method="POST">
+
+<textarea
+name="message"
+placeholder="Enter message here..."
+required>
+</textarea>
+
+<br><br>
+
+<button type="submit">
+Analyze Message
+</button>
+
 </form>
 
-{% if result %}
-<h3>{{ result }}</h3>
+{% if category %}
+
+<div class="result">
+
+<h2>Analysis Result</h2>
+
+<p><b>Category:</b> {{ category }}</p>
+
+<p><b>Threat Level:</b> {{ threat_level }}</p>
+
+<p><b>Confidence:</b> {{ confidence }}%</p>
+
+<h3>Detected Keywords</h3>
+
+<ul>
+{% for word in words %}
+<li>{{ word }}</li>
+{% endfor %}
+</ul>
+
+<h3>Safety Recommendations</h3>
+
+<ul>
+{% for tip in tips %}
+<li>{{ tip }}</li>
+{% endfor %}
+</ul>
+
+</div>
+
 {% endif %}
 
-{% if confidence %}
-<p>Confidence: {{ confidence }}%</p>
-{% endif %}
+<br>
 
-{% if words %}
-<p>Detected: {{ words }}</p>
-{% endif %}
+<a href="/logout">
+<button>Logout</button>
+</a>
+
+</div>
 
 </body>
 </html>
